@@ -3,8 +3,7 @@
  * Comunicação com a API FastAPI no Render.
  */
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://tutor-virtual-q3hd.onrender.com";
+const API_URL = "";
 
 export interface ApiSuccessResponse {
   pergunta_recebida: string;

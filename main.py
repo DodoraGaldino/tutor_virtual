@@ -13,15 +13,23 @@ load_dotenv()
 app = FastAPI(
     title="Tutor Virtual PET-BSI",
     description="Assistente educacional com IA para Sistemas de Informação",
-    version="1.2.0"
+    version="1.2.0",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
-# Permite requisições de qualquer origem (frontend local ou na nuvem)
+# Permite requisições apenas das origens autorizadas (Vercel e desenvolvimento local)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://tutorvirtual-five.vercel.app",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -152,7 +160,7 @@ class Mensagem(BaseModel):
 
 @app.get("/")
 def raiz():
-    return {"status": "ok", "mensagem": "API do Tutor Virtual PET-BSI online!"}
+    return {"status": "ok"}
 
 
 @app.post("/chat")
