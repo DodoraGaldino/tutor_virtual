@@ -145,6 +145,7 @@ export default function Chat() {
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const footerTextareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // No desktop (>= 768px), abre a sidebar por padrão ao carregar
@@ -243,8 +244,12 @@ export default function Chat() {
 
   // Foco
   useEffect(() => {
-    textareaRef.current?.focus();
-  }, [activeId]);
+    if (currentMessages.length > 0) {
+      footerTextareaRef.current?.focus();
+    } else {
+      textareaRef.current?.focus();
+    }
+  }, [activeId, currentMessages.length]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -292,6 +297,12 @@ export default function Chat() {
       const imagePayload = selectedImage;
 
       setInput("");
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
+      if (footerTextareaRef.current) {
+        footerTextareaRef.current.style.height = "auto";
+      }
       setSelectedImage(null);
       setImageName(null);
       setIsLoading(true);
@@ -369,7 +380,13 @@ export default function Chat() {
         );
       } finally {
         setIsLoading(false);
-        setTimeout(() => textareaRef.current?.focus(), 50);
+        setTimeout(() => {
+          if (footerTextareaRef.current) {
+            footerTextareaRef.current.focus();
+          } else {
+            textareaRef.current?.focus();
+          }
+        }, 50);
       }
     },
     [isLoading, selectedImage, activeId, conversations]
@@ -418,6 +435,12 @@ export default function Chat() {
       setConversations([]);
       setActiveId(null);
       setInput("");
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+      }
+      if (footerTextareaRef.current) {
+        footerTextareaRef.current.style.height = "auto";
+      }
       setSelectedImage(null);
       setImageName(null);
       try {
@@ -933,11 +956,11 @@ export default function Chat() {
                 </div>
               )}
 
-              <div className="relative flex items-center rounded-xl sm:rounded-2xl bg-[#150e22] border border-[#2e1d44] focus-within:border-[#7c3aed] focus-within:ring-2 focus-within:ring-[#7c3aed]/20 p-1.5 sm:p-2 pl-2.5 sm:pl-3.5 pr-1.5 sm:pr-2.5 shadow-xl transition-all">
+              <div className="relative flex items-end rounded-xl sm:rounded-2xl bg-[#150e22] border border-[#2e1d44] focus-within:border-[#7c3aed] focus-within:ring-2 focus-within:ring-[#7c3aed]/20 p-1.5 sm:p-2 pl-2.5 sm:pl-3.5 pr-1.5 sm:pr-2.5 shadow-xl transition-all">
                 <button
                   type="button"
                   onClick={triggerFileInput}
-                  className="w-8 h-8 rounded-full bg-[#1f1433] hover:bg-[#2b1a46] border border-[#372456] text-[#c4b5fd] flex items-center justify-center transition cursor-pointer mr-2 sm:mr-2.5 flex-shrink-0"
+                  className="w-8 h-8 rounded-full bg-[#1f1433] hover:bg-[#2b1a46] border border-[#372456] text-[#c4b5fd] flex items-center justify-center transition cursor-pointer mr-2 sm:mr-2.5 flex-shrink-0 mb-0.5"
                   title="Enviar imagem de exercício"
                 >
                   <svg className="w-4 h-4 text-[#c4b5fd]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -945,30 +968,30 @@ export default function Chat() {
                   </svg>
                 </button>
 
-                <input
-                  type="text"
+                <textarea
+                  ref={footerTextareaRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      sendMessage(input);
-                    }
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    e.target.style.height = "auto";
+                    e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`;
                   }}
+                  onKeyDown={handleKeyDown}
                   disabled={isLoading}
+                  rows={1}
                   placeholder={
                     selectedImage
                       ? "Dúvida sobre a imagem..."
                       : "Pergunte algo ou envie foto no clipe..."
                   }
-                  className="w-full bg-transparent text-white font-medium text-sm sm:text-base placeholder:text-[#6f5e88] focus:outline-none pr-2 sm:pr-3"
+                  className="w-full bg-transparent text-white font-medium text-sm sm:text-base placeholder:text-[#6f5e88] focus:outline-none pr-2 sm:pr-3 resize-none py-1.5 min-h-[36px] max-h-40 leading-relaxed overflow-y-auto"
                 />
 
                 <button
                   onClick={() => sendMessage(input)}
                   disabled={!canSend}
                   aria-label="Enviar"
-                  className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white flex items-center justify-center transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-[#7c3aed]/40 active:scale-95"
+                  className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white flex items-center justify-center transition cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-[#7c3aed]/40 active:scale-95 mb-0.5"
                 >
                   {isLoading ? (
                     <svg className="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
