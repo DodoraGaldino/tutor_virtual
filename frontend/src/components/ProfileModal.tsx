@@ -130,9 +130,13 @@ export default function ProfileModal() {
         {/* Botão Fechar */}
         <button
           onClick={() => setIsProfileOpen(false)}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#1e1333] hover:bg-[#2c1b48] text-[#c4b5fd] hover:text-white flex items-center justify-center text-sm font-bold transition cursor-pointer"
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-[#1e1333] hover:bg-[#2c1b48] text-[#c4b5fd] hover:text-white flex items-center justify-center transition cursor-pointer"
+          title="Fechar"
+          aria-label="Fechar"
         >
-          ✕
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
 
         {user ? (
@@ -196,8 +200,11 @@ export default function ProfileModal() {
         ) : (
           /* ── LOGIN COM GOOGLE ── */
           <div className="flex flex-col items-center text-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#1c1230] border border-[#3b2360] flex items-center justify-center mb-4 text-2xl shadow-md">
-              🎓
+            <div className="w-14 h-14 rounded-2xl bg-[#1c1230] border border-[#3b2360] flex items-center justify-center mb-4 text-[#c084fc] shadow-md">
+              <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 14l9-5-9-5-9 5 9 5z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+              </svg>
             </div>
 
             <h2 className="text-2xl font-black text-white tracking-tight mb-1">
@@ -208,8 +215,11 @@ export default function ProfileModal() {
             </p>
 
             {errorMsg && (
-              <div className="w-full mb-4 p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-200 text-xs text-left leading-relaxed">
-                ⚠️ {errorMsg}
+              <div className="w-full mb-4 p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-200 text-xs text-left leading-relaxed flex items-center gap-2">
+                <svg className="w-4 h-4 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>{errorMsg}</span>
               </div>
             )}
 
@@ -288,8 +298,11 @@ export default function ProfileModal() {
               </button>
             </form>
 
-            <p className="text-[10px] text-[#7d6f92] mt-4 leading-normal">
-              🔒 O login conecta diretamente aos servidores oficiais da Google via OAuth 2.0.
+            <p className="text-[10px] text-[#7d6f92] mt-4 leading-normal flex items-center justify-center gap-1.5">
+              <svg className="w-3.5 h-3.5 text-[#9e8cb7]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span>O login conecta diretamente aos servidores oficiais da Google via OAuth 2.0.</span>
             </p>
           </div>
         )}

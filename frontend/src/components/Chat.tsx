@@ -26,36 +26,31 @@ function getTimeString(): string {
 }
 
 interface SuggestionPill {
-  icon: string;
   label: string;
   prompt: string;
 }
 
 const TOP_PILLS: SuggestionPill[] = [
   {
-    icon: "✏️",
     label: "Resolver Integral",
     prompt: "Como calcular a integral indefinida de cos(x) passo a passo?",
   },
   {
-    icon: "🗄️",
     label: "Normalização 3NF",
     prompt: "Explique o que é a 3ª Forma Normal (3NF) com um exemplo prático de tabela.",
   },
   {
-    icon: "⚡",
     label: "Algoritmos Big-O",
     prompt: "Explique a diferença de complexidade Big-O entre Busca Linear e Busca Binária.",
   },
   {
-    icon: "🌐",
     label: "Modelo OSI",
     prompt: "Como funciona o modelo OSI comparado ao TCP/IP na prática?",
   },
 ];
 
 interface FeatureCard {
-  icon: string;
+  iconType: "math" | "db" | "code";
   badge: string;
   title: string;
   description: string;
@@ -64,21 +59,21 @@ interface FeatureCard {
 
 const FEATURE_CARDS: FeatureCard[] = [
   {
-    icon: "📐",
+    iconType: "math",
     badge: "Calcular ↗",
     title: "Cálculo & Matemática",
     description: "Integrais, derivadas, limites e fórmulas resolvidos passo a passo em LaTeX.",
     prompt: "Me ajude a resolver e entender o cálculo de derivadas e integrais passo a passo.",
   },
   {
-    icon: "🗄️",
+    iconType: "db",
     badge: "Aprender ↗",
     title: "Banco de Dados & SQL",
     description: "Modelagem ER, SQL avançado, 1NF/2NF/3NF e otimização de consultas.",
     prompt: "Explique as formas normais em Banco de Dados com exemplos práticos.",
   },
   {
-    icon: "💻",
+    iconType: "code",
     badge: "Explorar ↗",
     title: "Algoritmos & Código",
     description: "Estruturas de dados, complexidade Big-O, grafos e código limpo.",
@@ -361,7 +356,7 @@ export default function Chat() {
         const errorMessage: MessageData = {
           id: genId(),
           sender: "error",
-          text: `⚠️ **Não foi possível conectar ao backend.**\n\n\`${msg}\``,
+          text: `**Não foi possível conectar ao backend.**\n\n\`${msg}\``,
           timestamp: getTimeString(),
         };
 
@@ -486,36 +481,36 @@ export default function Chat() {
         className="hidden"
       />
 
-      {/* Backdrop escuro no mobile quando o menu lateral estiver aberto */}
+      {/* Backdrop escuro quando o menu lateral (histórico & conta) estiver aberto */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/75 backdrop-blur-xs z-40 md:hidden animate-fade-in"
+          className="fixed inset-0 bg-black/80 backdrop-blur-xs z-40 md:hidden animate-fade-in"
           onClick={() => setSidebarOpen(false)}
           aria-label="Fechar menu lateral"
         />
       )}
 
-      {/* ── BARRA LATERAL (DRAWER NO MOBILE / COLLAPSIBLE NO DESKTOP) ── */}
+      {/* ── PAINEL LATERAL DESLIZANTE (HISTÓRICO + LOGIN COM GOOGLE) ── */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col flex-shrink-0 bg-[#0e0a18] text-[#ede9f6] border-r border-[#1f1530] overflow-hidden select-none transition-all duration-300 ease-in-out ${
+        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col flex-shrink-0 bg-[#0e0a18] text-[#ede9f6] border-r border-[#26173f] overflow-hidden select-none transition-all duration-300 ease-in-out ${
           sidebarOpen
-            ? "w-72 max-w-[85vw] translate-x-0 shadow-2xl md:shadow-none"
+            ? "w-80 max-w-[88vw] translate-x-0 shadow-2xl md:shadow-none"
             : "-translate-x-full md:translate-x-0 md:w-0 w-0 pointer-events-none md:pointer-events-auto"
         }`}
       >
         <div className="p-4 sm:p-5 flex flex-col h-full justify-between">
           <div className="flex flex-col min-h-0 flex-1">
-            {/* Logo do App no topo da Sidebar */}
-            <div className="flex items-center justify-between mb-4 px-1">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#201338] border border-[#3e2466] text-[#c084fc] flex items-center justify-center font-black text-sm shadow-md shadow-[#7c3aed]/15">
+            {/* Topo do Painel com Branding e Botão Fechar */}
+            <div className="flex items-center justify-between mb-4 px-1 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#201338] border border-[#3e2466] text-[#c084fc] flex items-center justify-center font-black text-sm shadow-md shadow-[#7c3aed]/15">
                   ✦
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-black text-base tracking-tight text-white leading-none">
+                  <span className="font-black text-sm tracking-tight text-white leading-none">
                     PET-BSI
                   </span>
-                  <span className="text-[10px] font-bold tracking-widest text-[#a78bfa] uppercase mt-0.5">
+                  <span className="text-[9px] font-bold tracking-widest text-[#a78bfa] uppercase mt-0.5">
                     Tutor Virtual
                   </span>
                 </div>
@@ -523,91 +518,106 @@ export default function Chat() {
 
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="w-8 h-8 rounded-lg hover:bg-[#1a1228] text-slate-400 hover:text-white transition flex items-center justify-center cursor-pointer md:hidden"
+                className="w-8 h-8 rounded-xl bg-[#1b122c] hover:bg-[#25183d] text-slate-400 hover:text-white transition flex items-center justify-center cursor-pointer border border-[#2e1d48]"
                 title="Fechar menu"
                 aria-label="Fechar menu"
               >
-                ✕
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
 
-            {/* Card de Conexão com Google (Super visível no celular e computador) */}
-            <div
-              onClick={() => {
-                if (typeof window !== "undefined" && window.innerWidth < 768) {
-                  setSidebarOpen(false);
-                }
-                setIsProfileOpen(true);
-              }}
-              className="mb-4 p-3 rounded-2xl bg-gradient-to-r from-[#170f28] to-[#140e24] border border-[#362156] hover:border-[#7c3aed] transition cursor-pointer shadow-md group text-left"
-              title="Conta Google e Sincronização"
-            >
+            {/* SEÇÃO 1: LOGIN COM GOOGLE (EM DESTAQUE NO TOPO DA TELA PUXADA) */}
+            <div className="mb-4 p-3.5 rounded-2xl bg-gradient-to-b from-[#1a102e] to-[#120b22] border border-[#3e2468] shadow-lg text-left flex-shrink-0">
               {user ? (
-                <div className="flex items-center gap-2.5">
-                  <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#7c3aed] bg-[#1e1333] flex-shrink-0">
-                    {user.picture ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={user.picture} alt={user.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-sm flex items-center justify-center h-full">🎓</span>
-                    )}
-                    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-[#160f26]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-white truncate">{user.name}</div>
-                    <div className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Google Conectado
+                <div>
+                  <div className="flex items-center gap-2.5 mb-2.5">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[#7c3aed] bg-[#1e1333] flex-shrink-0 shadow-sm">
+                      {user.picture ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={user.picture} alt={user.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[#c084fc]">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                      )}
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border border-[#120b22]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-white truncate">{user.name}</div>
+                      <div className="text-[10px] text-[#9b89b4] truncate">{user.email || "aluno@bsi.edu.br"}</div>
+                      <div className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1 mt-0.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        Google Conectado
+                      </div>
                     </div>
                   </div>
-                  <span className="text-[11px] text-[#8e7aab] font-medium bg-[#1a112c] px-2 py-0.5 rounded-md border border-[#2e1d44]">
-                    Perfil
-                  </span>
+                  <button
+                    onClick={() => {
+                      if (typeof window !== "undefined" && window.innerWidth < 768) {
+                        setSidebarOpen(false);
+                      }
+                      setIsProfileOpen(true);
+                    }}
+                    className="w-full py-1.5 px-3 rounded-xl bg-[#201438] hover:bg-[#2a1a48] text-[#c084fc] hover:text-white font-bold text-[11px] transition text-center border border-[#3b2460] cursor-pointer"
+                  >
+                    Gerenciar Perfil / Desconectar
+                  </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-xs">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
-                      <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.36 7.37 24 12 24z" />
-                      <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.98 0 12s.46 3.84 1.26 5.42l4.02-3.15z" />
-                      <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.64 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-white group-hover:text-[#c084fc] transition-colors">
-                      Entrar com Google
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.36 7.37 24 12 24z" />
+                        <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.98 0 12s.46 3.84 1.26 5.42l4.02-3.15z" />
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.64 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
+                      </svg>
                     </div>
-                    <div className="text-[10px] text-[#9b89b4] truncate">
-                      Salvar histórico na nuvem
-                    </div>
+                    <span className="text-xs font-bold text-white">Conta Google</span>
                   </div>
-                  <span className="text-[10px] text-white font-bold bg-[#7c3aed] px-2 py-0.5 rounded-full">
-                    Entrar
-                  </span>
+                  <p className="text-[11px] text-[#baa9d0] mb-2.5 leading-relaxed">
+                    Conecte para sincronizar suas dúvidas e salvar seu histórico na nuvem.
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (typeof window !== "undefined" && window.innerWidth < 768) {
+                        setSidebarOpen(false);
+                      }
+                      setIsProfileOpen(true);
+                    }}
+                    className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition cursor-pointer active:scale-95"
+                  >
+                    <span>Entrar com o Google</span>
+                    <span className="text-xs">→</span>
+                  </button>
                 </div>
               )}
             </div>
 
-            {/* Botão + Novo Chat (Estilo Pílula Escura) */}
+            {/* SEÇÃO 2: BOTÃO NOVA CONVERSA */}
             <button
               onClick={handleNewChat}
-              className="w-full py-2.5 px-3.5 mb-4 rounded-xl bg-[#1b122c] hover:bg-[#25183d] border border-[#2e1d48] hover:border-[#7c3aed]/50 text-white text-xs font-semibold flex items-center justify-between transition shadow-sm cursor-pointer active:scale-98 group"
+              className="w-full py-2.5 px-4 mb-3 rounded-xl bg-gradient-to-r from-[#7c3aed] to-[#9333ea] hover:from-[#6d28d9] hover:to-[#7e22ce] text-white text-xs font-bold flex items-center justify-between transition shadow-md shadow-[#7c3aed]/25 cursor-pointer active:scale-95 flex-shrink-0"
             >
               <div className="flex items-center gap-2">
-                <span className="text-sm text-[#c084fc] group-hover:rotate-90 transition-transform">✦</span>
+                <span>✦</span>
                 <span>Nova Conversa</span>
               </div>
-              <span className="text-[10px] text-[#8e7aab] font-mono bg-[#140d22] px-1.5 py-0.5 rounded border border-[#291a3e]">
+              <span className="text-[10px] bg-black/25 px-2 py-0.5 rounded-md font-mono">
                 + Novo
               </span>
             </button>
 
-            {/* Cabeçalho do Histórico com Botão de Limpar Tudo */}
+            {/* SEÇÃO 3: CABEÇALHO DO HISTÓRICO COM LIMPAR TUDO */}
             <div className="flex items-center justify-between mb-2 px-1 flex-shrink-0">
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-[#796792]">
-                  Histórico Recente
+                  Histórico de Conversas
                 </span>
                 <span className="text-[10px] text-[#a78bfa] font-bold bg-[#1e1333] px-1.5 py-0.2 rounded-full border border-[#311f4d]">
                   {conversations.length}
@@ -629,7 +639,7 @@ export default function Chat() {
               )}
             </div>
 
-            {/* Lista de Conversas do Histórico com Botão de Excluir Fixo */}
+            {/* SEÇÃO 4: LISTA DE CONVERSAS COM BOTÃO DE EXCLUIR FIXO */}
             <div className="flex flex-col gap-1 overflow-y-auto flex-1 pr-1 py-1">
               {conversations.length === 0 ? (
                 <div className="text-xs text-[#796792] italic p-3 text-center">
@@ -649,7 +659,9 @@ export default function Chat() {
                       }`}
                     >
                       <div className="flex items-center gap-2.5 truncate flex-1 pr-1">
-                        <span className="text-xs text-[#a78bfa] opacity-80">💬</span>
+                        <svg className="w-3.5 h-3.5 text-[#a78bfa] opacity-80 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
                         <span className="truncate">{conv.title}</span>
                       </div>
 
@@ -674,78 +686,39 @@ export default function Chat() {
 
       {/* ── ÁREA PRINCIPAL COM AMBIENTE ROXO ESCURO ───────────── */}
       <main className="flex-1 flex flex-col h-full min-h-0 bg-[#0c0816] bg-[radial-gradient(ellipse_75%_55%_at_50%_15%,#261545_0%,#0c0816_70%)] relative overflow-hidden">
-        {/* Header Superior Moderno */}
-        <header className="h-14 sm:h-16 px-3.5 sm:px-8 flex items-center justify-between flex-shrink-0 z-10 border-b border-[#1c1328]">
-          <div className="flex items-center gap-2 sm:gap-3.5">
-            {/* Botão de Histórico (com ícone e texto no celular para fácil acesso) */}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-[#140e22] hover:bg-[#1f1433] border border-[#26173b] hover:border-[#7c3aed] text-slate-200 hover:text-white transition cursor-pointer"
-              title="Abrir histórico de conversas"
-            >
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#c084fc]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              <span className="text-xs font-bold md:hidden text-[#ede9f6]">Histórico</span>
-            </button>
-
-            {/* Pill Modelo de IA (Estilo Zyricon) - Oculto em telas bem pequenas para dar espaço aos botões */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#150e22] border border-[#2b1b40] text-xs font-semibold text-[#c4b5fd] shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>PET-BSI Tutor AI</span>
-              <span className="text-[10px] text-[#86739f] font-mono bg-[#1f1433] px-1.5 py-0.2 rounded">v1.2</span>
-            </div>
+        {/* ── BOTÃO FIXO NO CANTO SUPERIOR ESQUERDO (SEMPRE VISÍVEL) ── */}
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed top-3 left-3 z-30 flex items-center gap-2 px-3 py-2 rounded-2xl bg-[#160d26]/95 hover:bg-[#201438] active:scale-95 border border-[#3e2366] hover:border-[#7c3aed] text-white shadow-xl shadow-black/70 backdrop-blur-md transition-all cursor-pointer group"
+          title="Abrir Histórico e Conta Google"
+          aria-label="Abrir Menu de Histórico e Conta Google"
+        >
+          <div className="w-5 h-5 rounded-lg bg-[#271542] group-hover:bg-[#7c3aed] text-[#c084fc] group-hover:text-white flex items-center justify-center transition-colors">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </div>
+          <span className="text-xs font-bold text-white tracking-wide">
+            Histórico & Conta
+          </span>
+          {user ? (
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+          ) : (
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c084fc]" />
+          )}
+        </button>
 
-          <div className="flex items-center gap-2">
-            {/* Botão de Conectar com Google no Header */}
-            {user ? (
-              <button
-                onClick={() => setIsProfileOpen(true)}
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#160f24] hover:bg-[#201534] border border-[#2e1d44] hover:border-[#7c3aed] text-xs font-bold text-white transition cursor-pointer shadow-xs"
-                title="Conta Google conectada"
-              >
-                {user?.picture ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={user.picture}
-                    alt={user.name}
-                    className="w-5 h-5 rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                )}
-                <span className="max-w-[70px] sm:max-w-[120px] truncate">
-                  {firstName}
-                </span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsProfileOpen(true)}
-                className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs transition cursor-pointer shadow-md active:scale-95"
-                title="Entrar com Conta Google"
-              >
-                <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
-                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.36 7.37 24 12 24z" />
-                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.98 0 12s.46 3.84 1.26 5.42l4.02-3.15z" />
-                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.64 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
-                </svg>
-                <span className="text-xs">Entrar</span>
-              </button>
-            )}
+        {/* ── BOTÃO FIXO NO CANTO SUPERIOR DIREITO (+ NOVA CONVERSA) ── */}
+        <button
+          onClick={handleNewChat}
+          className="fixed top-3 right-3 z-30 flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-[#7c3aed] hover:bg-[#6d28d9] active:scale-95 text-white text-xs font-bold shadow-xl shadow-[#7c3aed]/30 transition cursor-pointer"
+          title="Nova conversa"
+        >
+          <span>+ Nova</span>
+        </button>
 
-            <button
-              onClick={handleNewChat}
-              className="flex items-center gap-1 text-xs font-bold text-white bg-[#7c3aed] hover:bg-[#6d28d9] px-3 sm:px-3.5 py-1.5 rounded-full transition shadow-md shadow-[#7c3aed]/30 cursor-pointer active:scale-95"
-            >
-              <span>+ Nova</span>
-            </button>
-          </div>
-        </header>
-
-        {/* ── CONTEÚDO PRINCIPAL ──────────────────────────────── */}
-        <div className="flex-1 min-h-0 overflow-y-auto px-2 sm:px-8 md:px-12 py-3 flex flex-col">
+        {/* ── CONTEÚDO PRINCIPAL (COM PADDING SUPERIOR PARA OS BOTÕES FIXOS) ── */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-2.5 sm:px-8 md:px-12 pt-16 pb-3 flex flex-col">
           {!hasMessages ? (
             /* ── TELA INICIAL CENTRALIZADA (ESTILO ZYRICON / DARK PURPLE) ── */
             <div className="flex-1 flex flex-col items-center justify-center max-w-3xl w-full mx-auto px-1 sm:px-2 animate-fade-in my-auto pb-4 sm:pb-6 pt-2 sm:pt-4">
@@ -766,9 +739,8 @@ export default function Chat() {
                   <button
                     key={idx}
                     onClick={() => sendMessage(pill.prompt)}
-                    className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-[#160e22] hover:bg-[#25183a] border border-[#2c1d42] hover:border-[#7c3aed] text-[11px] sm:text-xs font-medium text-[#d8cce8] hover:text-white transition shadow-sm cursor-pointer"
+                    className="flex items-center px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-[#160e22] hover:bg-[#25183a] border border-[#2c1d42] hover:border-[#7c3aed] text-[11px] sm:text-xs font-medium text-[#d8cce8] hover:text-white transition shadow-sm cursor-pointer"
                   >
-                    <span>{pill.icon}</span>
                     <span>{pill.label}</span>
                   </button>
                 ))}
@@ -789,16 +761,21 @@ export default function Chat() {
                         {imageName || "Imagem selecionada"}
                       </span>
                       <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
-                        ✓ Imagem pronta para análise
+                        <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Imagem pronta para análise
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={handleRemoveImage}
-                      className="w-7 h-7 rounded-full bg-[#26173d] hover:bg-rose-950 text-slate-400 hover:text-rose-200 flex items-center justify-center text-xs font-bold transition cursor-pointer"
+                      className="w-7 h-7 rounded-full bg-[#26173d] hover:bg-rose-950 text-slate-400 hover:text-rose-200 flex items-center justify-center transition cursor-pointer"
                       title="Remover imagem"
                     >
-                      ✕
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   </div>
                 )}
@@ -829,7 +806,9 @@ export default function Chat() {
                       className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#1f1433] hover:bg-[#2b1a46] border border-[#372456] text-[#c4b5fd] hover:text-white text-xs font-semibold transition cursor-pointer shadow-xs active:scale-95"
                       title="Enviar imagem de exercício ou diagrama"
                     >
-                      <span>📎</span>
+                      <svg className="w-3.5 h-3.5 text-[#c4b5fd]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
                       <span>Anexar Imagem</span>
                     </button>
 
@@ -867,7 +846,23 @@ export default function Chat() {
                     className="bg-[#130d1f] hover:bg-[#1a112a] border border-[#26173a] hover:border-[#633996] rounded-xl sm:rounded-2xl p-3.5 sm:p-4 text-left transition group cursor-pointer shadow-lg"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xl">{card.icon}</span>
+                      <div className="w-6 h-6 flex items-center justify-center">
+                        {card.iconType === "math" && (
+                          <svg className="w-5 h-5 text-[#c084fc]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10H9m-3-5h12M4 4h16v16H4V4z" />
+                          </svg>
+                        )}
+                        {card.iconType === "db" && (
+                          <svg className="w-5 h-5 text-[#c084fc]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m-16 5c0 2.21 3.582 4 8 4s8-1.79 8-4m-16 5c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7" />
+                          </svg>
+                        )}
+                        {card.iconType === "code" && (
+                          <svg className="w-5 h-5 text-[#c084fc]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                          </svg>
+                        )}
+                      </div>
                       <span className="text-[10px] font-bold text-[#c084fc] bg-[#22133a] group-hover:bg-[#7c3aed] group-hover:text-white px-2 py-0.5 rounded-full transition">
                         {card.badge}
                       </span>
@@ -918,17 +913,22 @@ export default function Chat() {
                     <span className="text-xs font-bold text-white truncate max-w-[180px] sm:max-w-[200px]">
                       {imageName || "Imagem selecionada"}
                     </span>
-                    <span className="text-[10px] text-emerald-400 font-semibold">
-                      ✓ Imagem pronta
+                    <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                      <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Imagem pronta
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={handleRemoveImage}
-                    className="w-6 h-6 rounded-full bg-[#26173d] hover:bg-rose-950 text-slate-400 hover:text-rose-200 flex items-center justify-center text-xs font-bold transition cursor-pointer"
+                    className="w-6 h-6 rounded-full bg-[#26173d] hover:bg-rose-950 text-slate-400 hover:text-rose-200 flex items-center justify-center transition cursor-pointer"
                     title="Remover imagem"
                   >
-                    ✕
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </button>
                 </div>
               )}
@@ -937,10 +937,12 @@ export default function Chat() {
                 <button
                   type="button"
                   onClick={triggerFileInput}
-                  className="w-8 h-8 rounded-full bg-[#1f1433] hover:bg-[#2b1a46] border border-[#372456] text-[#c4b5fd] flex items-center justify-center text-base font-bold transition cursor-pointer mr-2 sm:mr-2.5 flex-shrink-0"
+                  className="w-8 h-8 rounded-full bg-[#1f1433] hover:bg-[#2b1a46] border border-[#372456] text-[#c4b5fd] flex items-center justify-center transition cursor-pointer mr-2 sm:mr-2.5 flex-shrink-0"
                   title="Enviar imagem de exercício"
                 >
-                  📎
+                  <svg className="w-4 h-4 text-[#c4b5fd]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
                 </button>
 
                 <input
@@ -989,7 +991,7 @@ export default function Chat() {
         )}
       </main>
 
-      {/* ── MODAL FOFO DE CONFIRMAÇÃO DE EXCLUSÃO (TEMA ESCURO) ── */}
+      {/* ── MODAL DE CONFIRMAÇÃO DE EXCLUSÃO (TEMA ESCURO) ── */}
       {deleteModalId && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in"
@@ -1000,8 +1002,10 @@ export default function Chat() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Ícone */}
-            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-rose-950/40 border border-rose-800/60 flex items-center justify-center text-2xl shadow-xs">
-              🗑️
+            <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-rose-950/40 border border-rose-800/60 flex items-center justify-center shadow-xs text-rose-400">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
             </div>
 
             <h3 className="text-base font-black text-white tracking-tight mb-1">
@@ -1036,7 +1040,9 @@ export default function Chat() {
       {/* ── TOAST DE AVISO (TEMA ESCURO) ── */}
       {imageErrorToast && (
         <div className="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50 bg-[#1e1333] text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center justify-center sm:justify-start gap-2 text-xs font-bold animate-fade-in border border-[#4c2882]">
-          <span>✨</span>
+          <svg className="w-4 h-4 text-[#c084fc] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           <span>{imageErrorToast}</span>
         </div>
       )}
