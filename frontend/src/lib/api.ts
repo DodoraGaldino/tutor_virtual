@@ -3,7 +3,8 @@
  * Comunicação com a API FastAPI no Render.
  */
 
-const API_URL = "";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://tutor-virtual-q3hd.onrender.com";
 
 export interface ApiSuccessResponse {
   pergunta_recebida: string;
@@ -23,17 +24,29 @@ export async function enviarPergunta(
   pergunta: string,
   imagem?: string | null
 ): Promise<ApiResponse> {
-  const res = await fetch(`${API_URL}/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      pergunta,
-      imagem: imagem ?? null,
-    }),
-  });
+  try {
+    const res = await fetch(`${API_URL}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pergunta,
+        imagem: imagem ?? null,
+      }),
+    });
 
-  const data: ApiResponse = await res.json();
-  return data;
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      return {
+        erro: "O servidor está inicializando. Por favor, aguarde alguns instantes e envie novamente.",
+      };
+    }
+
+    const data: ApiResponse = await res.json();
+    return data;
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Erro de conexão";
+    return { erro: `Não foi possível conectar ao servidor: ${msg}` };
+  }
 }
 
 /**

@@ -19,17 +19,12 @@ app = FastAPI(
     openapi_url=None,
 )
 
-# Permite requisições apenas das origens autorizadas (Vercel e desenvolvimento local)
+# Permite conexões do frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://tutorvirtual-five.vercel.app",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-    ],
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
