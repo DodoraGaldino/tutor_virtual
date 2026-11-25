@@ -138,6 +138,7 @@ export default function Chat() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [coldStartTentativa, setColdStartTentativa] = useState<number>(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [deleteModalId, setDeleteModalId] = useState<string | null>(null);
@@ -335,7 +336,9 @@ export default function Chat() {
       }
 
       try {
-        const res = await enviarPergunta(trimmed, imagePayload);
+        const res = await enviarPergunta(trimmed, imagePayload, (tentativa) => {
+          setColdStartTentativa(tentativa);
+        });
 
         let botReply: MessageData;
 
@@ -380,6 +383,7 @@ export default function Chat() {
         );
       } finally {
         setIsLoading(false);
+        setColdStartTentativa(0);
         setTimeout(() => {
           if (footerTextareaRef.current) {
             footerTextareaRef.current.focus();
@@ -912,7 +916,7 @@ export default function Chat() {
                   <div className="flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#23143d] border border-[#4c2882] text-[#c084fc] flex items-center justify-center font-black text-[11px] sm:text-xs select-none mt-0.5 shadow-md">
                     PET
                   </div>
-                  <TypingIndicator />
+                  <TypingIndicator coldStart={coldStartTentativa > 0} tentativa={coldStartTentativa} />
                 </div>
               )}
               <div ref={bottomRef} />
