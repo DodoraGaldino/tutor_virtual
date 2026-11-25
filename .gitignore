@@ -2,16 +2,15 @@
 venv/
 __pycache__/
 *.pyc
-.env*
-*.env*
 *.db
 historico.db
+.env
+.env.local
 
 # Next.js / Node
 node_modules/
 .next/
 out/
-frontend/.env*
 
 # Logs
 npm-debug.log*

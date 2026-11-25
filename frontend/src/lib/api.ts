@@ -4,7 +4,9 @@
  */
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://tutor-virtual-q3hd.onrender.com";
+  process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.trim() !== ""
+    ? process.env.NEXT_PUBLIC_API_URL
+    : "https://tutor-virtual-q3hd.onrender.com";
 
 export interface ApiSuccessResponse {
   pergunta_recebida: string;

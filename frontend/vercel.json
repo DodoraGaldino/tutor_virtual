@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://tutor-virtual-q3hd.onrender.com",
+    "NEXT_PUBLIC_GOOGLE_CLIENT_ID": "100458584388-7qt7so3ndm779ho3aeoc4r87eh9dfgin.apps.googleusercontent.com"
+  }
+}
